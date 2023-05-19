@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<style>
+* {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+body {
+    background-color: #272b34;
+    font-family: 'Khula', sans-serif;
+    font-weight: 300;
+    color: white;
+    line-height: 1em;
+    margin: 0;
+  padding: 2em 1em;
+}
+
+</style>
+ <body>
+  <h1>Supervision la production nucléaire en infrajournalier</h1>
+  <div id='chart' class='chart'”></div>
+  <div id='chart2' class='chart'”></div>
+
+ </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+
+<script type='text/javascript'>
+var graphs = {{graphJSON | safe}};
+Plotly.plot('chart', graphs,{ });
+$(document).ready(function () {
+  var socket = io.connect();
+  console.log('OK')
+  socket.on("data", function (msg) {
+    console.log('received_data')
+    console.log(msg);
+    var graphs = msg;
+    Plotly.newPlot('chart',graphs,{});
+  });
+ });
+</script>
+</html>
