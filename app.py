@@ -27,7 +27,6 @@ def bar_with_plotly():
 
     # Create graphJSON
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
     # Use render_template to pass graphJSON to html
     return render_template('index.html', graphJSON=graphJSON)
 

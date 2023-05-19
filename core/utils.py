@@ -1,10 +1,9 @@
+import os
+import urllib.parse
 from datetime import datetime, timedelta
 
 import pandas as pd
-import pytz
 import requests
-import urllib.parse
-import os
 
 
 def get_token():
@@ -96,6 +95,7 @@ def get_data_from_api(start_date, end_date):
         else:
             return request_data(start_date, end_date)
     except ValueError:
+        raise ValueError
         print("Incorrect data format, should be YYYY-MM-DDTHH:MM:SS+HH:MM")
 
 
