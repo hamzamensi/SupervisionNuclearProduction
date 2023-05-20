@@ -7,6 +7,10 @@ import requests
 
 
 def get_token():
+    """
+    cette fonction sert à récupérer le token depuis api rte.
+    :return:
+    """
     r = requests.post('https://digital.iservices.rte-france.com/token/oauth/',
                       # auth=('725d36cd-672f-4912-8026-4242ea07d122', '37c90719-4d57-42bd-a5fe-7762f866d10d')
                       auth=(os.environ['ClientId'], os.environ['SecretId'])
@@ -22,7 +26,12 @@ def get_token():
     return token_type, access_token
 
 
-def get_sum_value_by_hour(df):
+def get_sum_mean_value_by_hour(df):
+    """
+    cette fonction permet de calculer la moyenne/somme de production nucléaire par heure par jour
+    :param df: dataframe ou il y a les valeurs de chaque date
+    :return: df contenant la date, somme de production, moyenne de production
+    """
     try:
         sum_per_hour = df['value'].sum()
         mean_by_hour = df['value'].mean()
@@ -35,11 +44,16 @@ def get_sum_value_by_hour(df):
 
 
 def get_nuclear_data(data):
+    """
+    cette fonction sert à filtrer et récuperer que les données de la procution nucléaire puis calculer la somme de production par heure
+    :param data: liste récupérée depuis l'api rte
+    :return: dataframe à afficher.
+    """
     try:
         values_by_unit = [val['values'] for val in data if val['unit']['production_type'] == 'NUCLEAR']
         all_values = [item for sub_list in values_by_unit for item in sub_list]
         df = pd.DataFrame(all_values)
-        df = df.groupby(['start_date']).apply(lambda x: get_sum_value_by_hour(x))
+        df = df.groupby(['start_date']).apply(lambda x: get_sum_mean_value_by_hour(x))
         return df
     except KeyError:
         raise KeyError()
@@ -47,6 +61,12 @@ def get_nuclear_data(data):
 
 
 def request_data(start_date, end_date):
+    """
+    lancer une request à RTE pour récupérer les données .
+    :param start_date: date de début
+    :param end_date: date de fin
+    :return: list de données de production
+    """
     try:
         startdateObject = datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S%z')
         enddateObject = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S%z')
@@ -76,6 +96,12 @@ def request_data(start_date, end_date):
 
 
 def get_data_from_api(start_date, end_date):
+    """
+    spliter la request sur plusieurs afin de respecter les exigences de l'api RTE (il faut pas dépasser 7 jours par request)
+    :param start_date: date de debut
+    :param end_date: date de fin
+    :return: liste de données finaux.
+    """
     try:
         start_time_object = datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S%z')
         end_time_object = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S%z')
@@ -100,6 +126,12 @@ def get_data_from_api(start_date, end_date):
 
 
 def get_data(start_date, end_date):
+    """
+    récuperer les données finales
+    :param start_date:
+    :param end_date:
+    :return: final dataframe contenant la moyenne/somme afin de l'afficher sous forme d'un graphe.
+    """
     data_per_unit = get_data_from_api(start_date, end_date)
     df = get_nuclear_data(data_per_unit)
     return df

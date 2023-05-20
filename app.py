@@ -19,7 +19,6 @@ import schedule
 
 
 def background_thread():
-    # Students data available in a list of list
     today = datetime.now(timezone.utc).astimezone()
     start_date = (datetime(today.year, today.month, today.day).astimezone() + timedelta(days=-7)).isoformat(sep="T", timespec="seconds")
     end_date = (datetime(today.year, today.month, today.day).astimezone() + timedelta(days=1)).isoformat(sep="T", timespec="seconds")
@@ -89,7 +88,6 @@ def realtime_show():
     # Use render_template to pass graphJSON to html
     return render_template('realtime.html', graphJSON=graphJSON)
 
-
 """
 Decorator for connect
 """
@@ -108,6 +106,7 @@ Decorator for disconnect
 @socketio.on('disconnect')
 def disconnect():
     print('Client disconnected',  request.sid)
+
 
 if __name__ == '__main__':
     socketio.run(app, allow_unsafe_werkzeug=True)
