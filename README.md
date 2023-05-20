@@ -2,7 +2,7 @@
 
 Pré-requis:
 - Il faut avoir une version python 3.9.
-- Il faut avoir un compte RTE, et Mettre le clientId, SecretId dans des variables d'environnements.
+- Il faut avoir un compte RTE, et Mettre le ClientId, SecretId dans des variables d'environnements.
 
 Installation:
 - cloner le projet en local.
