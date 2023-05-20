@@ -3,3 +3,4 @@ pandas
 plotly
 Flask
 Flask-SocketIO
+schedule
