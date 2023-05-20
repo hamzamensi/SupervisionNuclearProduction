@@ -89,10 +89,6 @@ def realtime_show():
     # Use render_template to pass graphJSON to html
     return render_template('realtime.html', graphJSON=graphJSON)
 
-@app.route('/test-realtime')
-def index():
-    #executor.submit(background_task_func)
-    return render_template('realtime_exp.html')
 
 """
 Decorator for connect
