@@ -1,21 +1,22 @@
-import time
-from datetime import datetime, timedelta, timezone
-
-import pandas as pd
-from flask import Flask, render_template, request
 import json
+import time
+import schedule
+
+from datetime import datetime, timedelta, timezone
+from threading import Lock
+
 import plotly
 import plotly.express as px
-from core.utils import get_data
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO
-from threading import Lock
+
+from core.utils import get_data
 
 thread = None
 thread_lock = Lock()
 # Create Home Page Route
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins='*')
-import schedule
 
 
 def background_thread():
@@ -37,9 +38,33 @@ def launch_background_task():
         schedule.run_pending()
         time.sleep(1)
 
+@app.route('/mean')
+def view_mean_by_hour():
+    # route pour afficher les données de 01 Décembre jusqu'à 10 décembre
+    start_date = '2022-12-01T00:00:00+01:00'
+    end_date = '2022-12-11T00:00:00+01:00'
+    # Students data available in a list of list
+    df = get_data(start_date, end_date)
+
+    # Create Bar chart
+    fig = px.bar(
+        df,
+        x='start_date',
+        y='mean_by_hour',
+        barmode='group',
+        labels={
+            'start_date': 'Date/Heure de producution',
+            'mean_by_hour': 'La moyenne de production nucléaire par heure par unité'
+        })
+
+    # Create graphJSON
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    # Use render_template to pass graphJSON to html
+    return render_template('index.html', graphJSON=graphJSON)
+
 
 @app.route('/')
-def bar_with_plotly():
+def view_sum_by_hour():
     # route pour afficher les données de 01 Décembre jusqu'à 10 décembre
     start_date = '2022-12-01T00:00:00+01:00'
     end_date = '2022-12-11T00:00:00+01:00'
@@ -64,7 +89,7 @@ def bar_with_plotly():
 
 
 @app.route('/realtime')
-def realtime_show():
+def view_realtime_show():
     # Route pour Récuperer les données d'une période hebdomaidaire glissante et les afficher.
     today = datetime.now(timezone.utc).astimezone()
     start_date = (datetime(today.year, today.month, today.day).astimezone() + timedelta(days=-7)).isoformat(sep="T",
